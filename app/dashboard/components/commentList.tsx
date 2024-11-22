@@ -1,19 +1,21 @@
+import AvatarCustom from "@/components/avatar";
+import { usePosts } from "@/providers/posts.provider";
 import {
-  Avatar,
   Box,
   ListItem,
   ListItemAvatar,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
 import CustomNameList from "./customNameList";
 
 export default function CommentList() {
+  const { postById } = usePosts();
   return (
     <Box>
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((item, i) => (
+      {postById?.comment.map((item, i) => (
         <ListItem alignItems="flex-start" key={i}>
           <ListItemAvatar>
-            <Avatar alt="taeza" src="/static/images/avatar/1.jpg" />
+            <AvatarCustom name={item?.userNameComment}/>
           </ListItemAvatar>
           <ListItemText
             sx={{
@@ -22,18 +24,10 @@ export default function CommentList() {
               fontWeight: 500,
               color: "#939494",
             }}
-            primary={<CustomNameList name={"Potae"} date={"1 min"} />}
-            secondary={
-              <Box component="span">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </Box>
+            primary={
+              <CustomNameList name={item?.userNameComment} date={item?.updateDate} />
             }
+            secondary={<Box component="span">{item?.comment}</Box>}
           />
         </ListItem>
       ))}

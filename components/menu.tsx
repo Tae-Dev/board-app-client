@@ -55,57 +55,57 @@ const StyledMenu = styled((props: MenuProps) => (
   },
 }));
 
-export default function MenuComponent() {
+type ListType = {
+  id: number;
+  title: string;
+};
+
+type PropsType = {
+  color?: string;
+  borderColor?: string;
+  variant?: any;
+  lists: ListType[];
+};
+
+export default function MenuCustom(props: PropsType) {
+  const { color, borderColor, variant, lists } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (e: any) => {
     setAnchorEl(null);
   };
 
   return (
     <Box>
       <Button
-        id="demo-customized-button"
-        aria-controls={open ? "demo-customized-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
-        variant="contained"
+        variant={variant || "outlined"}
         disableElevation
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
-        sx={{ backgroundColor: "transparent", color: "black" }}
+        sx={{
+          backgroundColor: "transparent",
+          color: color ? color : "#49A569",
+          borderColor: borderColor ? borderColor : "#49A569",
+        }}
       >
         Options
       </Button>
       <StyledMenu
-        id="demo-customized-menu"
-        MenuListProps={{
-          "aria-labelledby": "demo-customized-button",
-        }}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose} disableRipple>
-          <EditIcon />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
-          <FileCopyIcon />
-          Duplicate
-        </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose} disableRipple>
-          <ArchiveIcon />
-          Archive
-        </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
-          <MoreHorizIcon />
-          More
-        </MenuItem>
+        {lists?.map((item, i) => (
+          <MenuItem key={i} onClick={() => handleClose(item.id)} disableRipple>
+            {item.title}
+          </MenuItem>
+        ))}
       </StyledMenu>
     </Box>
   );

@@ -4,6 +4,9 @@ import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "@/theme";
+import PostsProvider from "@/providers/posts.provider";
+import BackdropCustom from "@/components/backdrop";
+import BackDropProvider from "@/providers/backdrop.provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +35,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <BackDropProvider>
+            <PostsProvider>
+              <ThemeProvider theme={theme}>{children}</ThemeProvider>
+            </PostsProvider>
+          </BackDropProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

@@ -1,4 +1,8 @@
 "use client";
+import AvatarCustom from "@/components/avatar";
+import { useBackDrop } from "@/providers/backdrop.provider";
+import { usePosts } from "@/providers/posts.provider";
+import AxiosInstance from "@/utils/axiosInstane";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import {
@@ -12,18 +16,38 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
-import Avatar from "@mui/material/Avatar";
-import React from "react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 import CommentList from "./commentList";
 import CustomNameList from "./customNameList";
-import { useRouter } from "next/navigation";
 
 export default function PostDetail() {
   const router = useRouter();
+  const { id } = useParams();
+  const { addPostById, postById } = usePosts();
+  const { openLoading } = useBackDrop();
 
   const onClickBackIcon = () => {
     router.push(`/dashboard/home`);
   };
+
+  const getPostById = async (id: string | string[] | undefined) => {
+    openLoading(true);
+    try {
+      const response = await AxiosInstance.get("/posts", {
+        params: { id: id },
+      });
+      addPostById(response.data.data);
+      openLoading(false);
+    } catch (error) {
+      openLoading(false);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getPostById(id);
+  }, [id]);
 
   return (
     <List
@@ -35,92 +59,93 @@ export default function PostDetail() {
         paddingTop: 4,
       }}
     >
-      <React.Fragment>
-        <IconButton aria-label="delete" onClick={onClickBackIcon}>
-          <ArrowBackIcon />
-        </IconButton>
-        <ListItem alignItems="flex-start">
-          <ListItemAvatar>
-            <Badge
-              color="success"
-              variant="dot"
-              overlap="circular"
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-            >
-              <Avatar alt="taeza" src="/static/images/avatar/1.jpg" />
-            </Badge>
-          </ListItemAvatar>
-          <ListItemText
-            sx={{
-              marginTop: 2,
-              fontSize: 24,
-              fontWeight: 500,
-              color: "#939494",
-            }}
-            primary={<CustomNameList name={"Potae"} date={"1 min"} />}
-          />
-        </ListItem>
-
-        <ListItem>
-          <Chip label="History" size="small" />
-        </ListItem>
-
-        <ListItem>
-          <ListItemText
-            primary="Brunch this weekend?"
-            secondary={
-              <Box component="span" className="line-clamp-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </Box>
-            }
-          />
-        </ListItem>
-
-        <ListItem>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <ChatBubbleOutlineIcon
-              sx={{ width: 12, height: 12, color: "#939494" }}
-            />
+      {postById && (
+        <React.Fragment>
+          <IconButton aria-label="delete" onClick={onClickBackIcon}>
+            <ArrowBackIcon />
+          </IconButton>
+          <ListItem alignItems="flex-start">
+            <ListItemAvatar>
+              <Badge
+                color="success"
+                variant="dot"
+                overlap="circular"
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+              >
+                <AvatarCustom name={postById?.userName} />
+              </Badge>
+            </ListItemAvatar>
             <ListItemText
-              primary="432 comments"
-              sx={{ fontSize: 12, color: "#939494" }}
+              sx={{
+                marginTop: 2,
+                fontSize: 24,
+                fontWeight: 500,
+                color: "#939494",
+              }}
+              primary={
+                <CustomNameList
+                  name={postById?.userName || ""}
+                  date={postById?.updateDate || ""}
+                />
+              }
             />
+          </ListItem>
+
+          <ListItem>
+            <Chip label={postById?.postType.title} size="small" />
+          </ListItem>
+
+          <ListItem>
+            <ListItemText
+              primary={postById?.title}
+              secondary={
+                <Box component="span" className="line-clamp-2">
+                  {postById?.description}
+                </Box>
+              }
+            />
+          </ListItem>
+
+          <ListItem>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <ChatBubbleOutlineIcon
+                sx={{ width: 12, height: 12, color: "#939494" }}
+              />
+              <ListItemText
+                primary={`${postById?.comment.length} Comment`}
+                sx={{ fontSize: 12, color: "#939494" }}
+              />
+            </Box>
+          </ListItem>
+
+          <Box className="p-4">
+            <Button
+              color="success"
+              variant="outlined"
+              sx={{ textTransform: "none" }}
+            >
+              Add Comment
+            </Button>
           </Box>
-        </ListItem>
 
-        <Box className="p-4">
-          <Button
-            color="success"
-            variant="outlined"
-            sx={{ textTransform: "none" }}
+          <Box
+            className="overflow-y-auto "
+            sx={{
+              height: "calc(100vh - 480px)",
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}
           >
-            Add Comment
-          </Button>
-        </Box>
-
-        <Box
-          className="overflow-y-auto "
-          sx={{
-            height: "calc(100vh - 480px)",
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-            msOverflowStyle: "none",
-            scrollbarWidth: "none",
-          }}
-        >
-          <CommentList />
-        </Box>
-      </React.Fragment>
+            <CommentList />
+          </Box>
+        </React.Fragment>
+      )}
     </List>
   );
 }

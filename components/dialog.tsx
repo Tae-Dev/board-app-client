@@ -1,15 +1,11 @@
-import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
-import theme from "@/theme";
+import * as React from "react";
 
-type propsType = {
+type PropsType = {
   title: string;
   content?: React.ReactNode;
   open: boolean;
@@ -19,13 +15,21 @@ type propsType = {
   handleConfirm: () => void;
 };
 
-export default function DialogCustom(props: propsType) {
-  const { title, content, open, titleConfirm, titleCancel, handleClose, handleConfirm } =
-    props;
+export default function DialogCustom(props: PropsType) {
+  const {
+    title,
+    content,
+    open,
+    titleConfirm,
+    titleCancel,
+    handleClose,
+    handleConfirm,
+  } = props;
 
   return (
     <React.Fragment>
       <Dialog
+        fullWidth
         open={open}
         onClose={handleClose}
         aria-labelledby="responsive-dialog-title"
