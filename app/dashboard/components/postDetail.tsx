@@ -3,6 +3,8 @@ import AvatarCustom from "@/components/avatar";
 import { useBackDrop } from "@/providers/backdrop.provider";
 import { usePosts } from "@/providers/posts.provider";
 import AxiosInstance from "@/utils/axiosInstane";
+import GetCookieValue from "@/utils/getCookieValue";
+import { yupResolver } from "@hookform/resolvers/yup";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import {
@@ -15,20 +17,43 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  TextField,
 } from "@mui/material";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import * as Yup from "yup";
 import CommentList from "./commentList";
 import CustomNameList from "./customNameList";
+
+const validationSchema = Yup.object({
+  comment: Yup.string().required("Comment is required"),
+});
 
 export default function PostDetail() {
   const router = useRouter();
   const { id } = useParams();
   const { addPostById, postById } = usePosts();
   const { openLoading } = useBackDrop();
+  const [isComment, setIsComment] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      comment: "",
+    },
+    resolver: yupResolver(validationSchema),
+  });
+
+  useEffect(() => {
+    getPostById(id);
+  }, [id]);
 
   const onClickBackIcon = () => {
-    router.push(`/dashboard/home`);
+    router.back();
   };
 
   const getPostById = async (id: string | string[] | undefined) => {
@@ -45,9 +70,23 @@ export default function PostDetail() {
     }
   };
 
-  useEffect(() => {
-    getPostById(id);
-  }, [id]);
+  const onSubmit = async (data: { comment: string }) => {
+    const userName = GetCookieValue("userName");
+    openLoading(true);
+    try {
+      const response = await AxiosInstance.post("/posts/comment", {
+        comment: data.comment,
+        userName: userName,
+        postId: postById?.id,
+      });
+      setIsComment(false);
+      getPostById(id);
+      openLoading(false);
+    } catch (error) {
+      openLoading(false);
+      throw error;
+    }
+  };
 
   return (
     <List
@@ -112,7 +151,7 @@ export default function PostDetail() {
           <ListItem>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ChatBubbleOutlineIcon
-                sx={{ width: 12, height: 12, color: "#939494" }}
+                sx={{ width: 16, height: 16, color: "#939494" }}
               />
               <ListItemText
                 primary={`${postById?.comment.length} Comment`}
@@ -121,16 +160,64 @@ export default function PostDetail() {
             </Box>
           </ListItem>
 
-          <Box className="p-4">
-            <Button
-              color="success"
-              variant="outlined"
-              sx={{ textTransform: "none" }}
-            >
-              Add Comment
-            </Button>
-          </Box>
-
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Box className="p-4">
+              {!isComment ? (
+                <Button
+                  color="success"
+                  variant="outlined"
+                  sx={{ textTransform: "none" }}
+                  onClick={() => setIsComment(true)}
+                >
+                  Add Comment
+                </Button>
+              ) : (
+                <Box className="flex flex-col gap-2 items-end">
+                  <TextField
+                    {...register("comment")}
+                    error={!!errors.comment}
+                    helperText={errors.comment?.message}
+                    minRows={10}
+                    multiline
+                    sx={{
+                      width: "100%",
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#49A569",
+                        },
+                      },
+                      "& .MuiInputLabel-root": {
+                        "&.Mui-focused": {
+                          color: "inherit",
+                        },
+                      },
+                    }}
+                    size="small"
+                    variant="outlined"
+                    placeholder="What’s on your mind..."
+                  />
+                  <Box className="flex gap-2">
+                    <Button
+                      sx={{ color: "#49A569", borderColor: "#49A569" }}
+                      variant="outlined"
+                      autoFocus
+                      onClick={() => setIsComment(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      sx={{ backgroundColor: "#49A569" }}
+                      variant="contained"
+                      autoFocus
+                      type="submit"
+                    >
+                      Confirm
+                    </Button>
+                  </Box>
+                </Box>
+              )}
+            </Box>
+          </form>
           <Box
             className="overflow-y-auto "
             sx={{

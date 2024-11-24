@@ -19,7 +19,9 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MenuListConstant } from "./constants/menuListConstant";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   alignItems: "flex-start",
@@ -32,14 +34,31 @@ export default function DashBoardLayout({
 }: {
   readonly children: React.ReactNode;
 }) {
-
+  const router = useRouter();
+  const pathname = usePathname()
   const [open, setOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(1);
+
+  useEffect(() => {
+    const pathSplit = pathname.split('/')
+    const index = MenuListConstant.findIndex((f) => f.path === pathSplit[2])
+    setSelectedIndex(index)
+  }, [pathname])
+  
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
 
+  const handleSignOut = () => {
+    document.cookie = "userName=; Path=/; Max-Age=0; Secure; SameSite=Strict";
+    router.push("/signin");
+  };
 
+  const handleListItemClick = (event: any, index: number) => {
+    setSelectedIndex(index);
+    router.push(`/dashboard/${MenuListConstant[index].path}`)
+  };
 
   return (
     <Box>
@@ -76,6 +95,7 @@ export default function DashBoardLayout({
                 height: "44px",
                 display: { xs: "none", sm: "inherit" },
               }}
+              onClick={handleSignOut}
             >
               Sign-Out
             </Button>
@@ -83,25 +103,28 @@ export default function DashBoardLayout({
         </AppBar>
       </Box>
       <Box className="bg-[#BBC2C0]" sx={{ height: "calc(100vh - 64px)" }}>
-        <Grid container size={12} sx={{height: "100%"}}>
-          <Grid size={{xs: 0, md: 3, lg: 3}} sx={{display: {xs: 'none', md: 'inherit'}}}>
+        <Grid container size={12} sx={{ height: "100%" }}>
+          <Grid
+            size={{ xs: 0, md: 3, lg: 3 }}
+            sx={{ display: { xs: "none", md: "inherit" } }}
+          >
             <List>
-              {["Home", "Our Board"].map((text, index) => (
-                <ListItem key={text} disablePadding>
-                  <ListItemButton>
+              {MenuListConstant.map((item, index) => (
+                <ListItem key={index} disablePadding>
+                  <ListItemButton
+                    selected={selectedIndex === index}
+                    onClick={(event) => handleListItemClick(event, index)}
+                  >
                     <ListItemIcon sx={{ color: "#243831" }}>
                       {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                     </ListItemIcon>
-                    <ListItemText primary={text} className="text-[#243831]" />
+                    <ListItemText primary={item.name} className="text-[#243831]" />
                   </ListItemButton>
                 </ListItem>
               ))}
             </List>
           </Grid>
-          <Grid size={{xs: 12, md: 9, lg: 9}}>
-            {children}
-          </Grid>
-          {/* <Grid size={{xs: 0, md: 3, lg: 3}} sx={{display: {xs: 'none', md: 'inherit'}}}></Grid> */}
+          <Grid size={{ xs: 12, md: 9, lg: 9 }}>{children}</Grid>
         </Grid>
       </Box>
       <TemporaryDrawer toggleDrawer={toggleDrawer} open={open} />

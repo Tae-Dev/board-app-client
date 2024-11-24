@@ -8,21 +8,29 @@ interface BackDropProviderProps {
 
 interface BackDropContextType {
   openLoading: (open: boolean) => void;
+  openBackDrop: boolean;
 }
 
 const BackDropContext = createContext<BackDropContextType>({
   openLoading: () => {},
+  openBackDrop: false,
 });
 
 const BackDropProvider: React.FC<BackDropProviderProps> = ({ children }) => {
   const [openBackDrop, setOpenBackDrop] = useState<boolean>(false);
 
   const openLoading = (open: boolean) => {
-    setOpenBackDrop(open);
+    if (open == false) {
+      setTimeout(() => {
+        setOpenBackDrop(open);
+      }, 200);
+    } else {
+      setOpenBackDrop(open);
+    }
   };
 
   return (
-    <BackDropContext.Provider value={{ openLoading }}>
+    <BackDropContext.Provider value={{ openLoading, openBackDrop }}>
       {children}
       <BackdropCustom open={openBackDrop} />
     </BackDropContext.Provider>

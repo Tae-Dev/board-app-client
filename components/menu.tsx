@@ -1,16 +1,15 @@
 "use client";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import EditIcon from "@mui/icons-material/Edit";
-import FileCopyIcon from "@mui/icons-material/FileCopy";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { alpha, styled } from "@mui/material/styles";
 import * as React from "react";
+import { useEffect } from "react";
+import {
+  UseFormSetValue
+} from "react-hook-form";
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -56,7 +55,7 @@ const StyledMenu = styled((props: MenuProps) => (
 }));
 
 type ListType = {
-  id: number;
+  id: number | null;
   title: string;
 };
 
@@ -65,17 +64,40 @@ type PropsType = {
   borderColor?: string;
   variant?: any;
   lists: ListType[];
+  setValue?: UseFormSetValue<any>;
+  name?: string;
+  value?: number | null | undefined;
+  handleSelectPostTypeValue?: (id: number | "") => any
 };
 
 export default function MenuCustom(props: PropsType) {
-  const { color, borderColor, variant, lists } = props;
+  const { color, borderColor, variant, lists, name, setValue, value, handleSelectPostTypeValue } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+
+  useEffect(() => {
+    if (value) {
+      let index = lists.findIndex((f) => f.id == value);
+      setSelectedIndex(index);
+      setValue && name && setValue(name, lists[index]?.id || "");
+    }
+  }, [value]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = (e: any) => {
+  const handleClose = (e: React.MouseEventHandler<HTMLLIElement>) => {
+    setAnchorEl(null);
+  };
+
+  const handleSelect = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    index: number
+  ) => {
+    setSelectedIndex(index);
+    handleSelectPostTypeValue && handleSelectPostTypeValue(lists[index]?.id || "")
+    setValue && name && setValue(name, lists[index]?.id || "");
     setAnchorEl(null);
   };
 
@@ -92,17 +114,22 @@ export default function MenuCustom(props: PropsType) {
           backgroundColor: "transparent",
           color: color ? color : "#49A569",
           borderColor: borderColor ? borderColor : "#49A569",
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          textTransform: 'capitalize'
         }}
       >
-        Options
+        {lists[selectedIndex]?.title}
       </Button>
-      <StyledMenu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-      >
+      <StyledMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {lists?.map((item, i) => (
-          <MenuItem key={i} onClick={() => handleClose(item.id)} disableRipple>
+          <MenuItem
+            key={i}
+            selected={i === selectedIndex}
+            onClick={(e) => handleSelect(e, i)}
+            disableRipple
+          >
             {item.title}
           </MenuItem>
         ))}

@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
       transform: "@mui/material/{{member}}",
     },
   },
+  reactStrictMode: true,
+  experimental: {
+    appDocumentPreloading: true
+  }
 };
 
 export default nextConfig;

@@ -1,7 +1,8 @@
 "use client";
+import { PostFeedTypeConstant } from "@/app/dashboard/constants/postFeedTypeConstant";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
-interface Post {
+export interface Post {
   id: number;
   title: string;
   description: string;
@@ -38,8 +39,12 @@ interface Comment {
 }
 
 interface PostType {
-  id: number;
+  id: number | null;
   title: string;
+}
+
+type PostFeedType = {
+  postFeedType: PostFeedTypeConstant
 }
 
 interface PostsProviderProps {

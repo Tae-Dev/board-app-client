@@ -1,26 +1,29 @@
 "use client";
 import DialogCustom from "@/components/dialog";
-import MenuCustom from "@/components/menu";
 import { useBackDrop } from "@/providers/backdrop.provider";
 import { usePosts } from "@/providers/posts.provider";
 import AxiosInstance from "@/utils/axiosInstane";
+import GetCookieValue from "@/utils/getCookieValue";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
-import {
-  Box,
-  Button,
-  InputAdornment,
-  TextField
-} from "@mui/material";
+import { Box, Button, InputAdornment, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useEffect, useState } from "react";
+import { PostFeedTypeConstant } from "../constants/postFeedTypeConstant";
 import FormCreate from "./formCreate";
 import PostList from "./postList";
+import MenuCustom from "@/components/menu";
+import FormSearch from "./formSearch";
 
-export default function PostFeed() {
+type PropsType = {
+  postFeedType: PostFeedTypeConstant;
+};
+
+export default function PostFeed(props: PropsType) {
+  const { postFeedType } = props;
   const [openModalCreate, setOpenModalCreate] = useState(false);
   const { postsList, addPosts, addPostType, postsTypeList } = usePosts();
-  const { openLoading } = useBackDrop();
+  const { openLoading, openBackDrop } = useBackDrop();
 
   const handleOpenModalCreate = () => {
     setOpenModalCreate(true);
@@ -30,19 +33,40 @@ export default function PostFeed() {
     setOpenModalCreate(false);
   };
 
-  const handleConfirmCreate = () => {
-    console.log("confirm");
+  const handleConfirmCreate = async (data: any) => {
+    const userName = GetCookieValue("userName");
+    openLoading(true);
+    try {
+      const response = await AxiosInstance.post("/posts", {
+        ...data,
+        userName: userName,
+      });
+      setOpenModalCreate(false);
+      fetchData();
+      openLoading(false);
+    } catch (error) {
+      openLoading(false);
+      throw error;
+    }
   };
 
-  const fetchData = async (keyword?: string) => {
+  const fetchData = async (keyword?: string, postTypeId?: string) => {
+    const userName = GetCookieValue("userName");
     openLoading(true);
     try {
       const response = await AxiosInstance.get("/posts", {
-        params: { keyword: keyword },
+        params: { keyword: keyword, postTypeId: postTypeId },
       });
 
+      if (postFeedType == PostFeedTypeConstant.All) {
+        addPosts(response.data.data);
+      } else {
+        let filterPosts = response.data.data.filter(
+          (item: any) => item.userName == userName
+        );
+        addPosts(filterPosts);
+      }
       openLoading(false);
-      addPosts(response.data.data);
     } catch (error) {
       openLoading(false);
       throw error;
@@ -53,9 +77,15 @@ export default function PostFeed() {
     openLoading(true);
     try {
       const response = await AxiosInstance.get("/post-type");
-      addPostType(response.data.data)
+      const mapData = [
+        {
+          id: null,
+          title: "Choose a community",
+        },
+      ].concat(response.data.data);
+
+      addPostType(mapData);
       openLoading(false);
-      
     } catch (error) {
       openLoading(false);
       throw error;
@@ -69,58 +99,13 @@ export default function PostFeed() {
 
   return (
     <Box className="flex flex-col w-full px-8 py-6 ">
-      <Grid size={{ xs: 12, md: 8 }} container>
-        <Grid className="flex flex-col gap-10 w-full">
-          <Box className="flex items-center w-full gap-2">
-            <TextField
-              onChange={(e) => {
-                if (e.target.value.length > 2 || e.target.value.length == 0) {
-                  fetchData(e.target.value);
-                }
-              }}
-              sx={{
-                width: "100%",
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#000000de",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  "&.Mui-focused": {
-                    color: "inherit",
-                  },
-                },
-              }}
-              size="small"
-              variant="outlined"
-              placeholder="Search"
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-            <MenuCustom color="black" variant={'contained'} lists={postsTypeList}/>
-            <Button
-              onClick={handleOpenModalCreate}
-              variant="contained"
-              sx={{
-                backgroundColor: "#49A569",
-                textTransform: "none",
-                borderRadius: "8px",
-                fontSize: "16px",
-                height: "40px",
-              }}
-              endIcon={<AddIcon />}
-            >
-              Create
-            </Button>
-          </Box>
-          {postsList?.length > 0 && (
+      <Grid size={{ xs: 12, md: 8 }} container sx={{ width: "100%" }}>
+        <Grid className="flex flex-col gap-6 w-full">
+          <FormSearch
+            fetchData={fetchData}
+            handleOpenModalCreate={handleOpenModalCreate}
+          />
+          {postsList?.length > 0 && !openBackDrop && (
             <Box
               className="overflow-y-auto "
               sx={{
@@ -133,7 +118,7 @@ export default function PostFeed() {
                 borderRadius: 2,
               }}
             >
-              <PostList />
+              <PostList postFeedType={postFeedType} fetchPost={fetchData} />
             </Box>
           )}
         </Grid>
@@ -141,12 +126,15 @@ export default function PostFeed() {
       </Grid>
       <DialogCustom
         title="Create Post"
-        content={<FormCreate />}
+        content={<FormCreate handleConfirm={handleConfirmCreate} />}
         open={openModalCreate}
         handleClose={handleCloseModalCreate}
         titleConfirm="ok"
         titleCancel="Cancel"
-        handleConfirm={handleConfirmCreate}
+        handleConfirmWithData={() => {
+          const formElement = document.querySelector("form");
+          if (formElement) formElement.requestSubmit();
+        }}
       />
     </Box>
   );

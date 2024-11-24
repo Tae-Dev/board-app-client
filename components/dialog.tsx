@@ -12,7 +12,9 @@ type PropsType = {
   titleConfirm: string;
   titleCancel: string;
   handleClose: () => void;
-  handleConfirm: () => void;
+  handleConfirmWithData?: () => void;
+  cancelButtonColor?: string;
+  confirmButtonColor?: string;
 };
 
 export default function DialogCustom(props: PropsType) {
@@ -23,7 +25,9 @@ export default function DialogCustom(props: PropsType) {
     titleConfirm,
     titleCancel,
     handleClose,
-    handleConfirm,
+    handleConfirmWithData,
+    cancelButtonColor,
+    confirmButtonColor,
   } = props;
 
   return (
@@ -38,7 +42,10 @@ export default function DialogCustom(props: PropsType) {
         <DialogContent>{content}</DialogContent>
         <DialogActions>
           <Button
-            sx={{ color: "#49A569", borderColor: "#49A569" }}
+            sx={{
+              color: cancelButtonColor ? cancelButtonColor : "#49A569",
+              borderColor: cancelButtonColor ? cancelButtonColor : "#49A569",
+            }}
             variant="outlined"
             autoFocus
             onClick={handleClose}
@@ -46,9 +53,13 @@ export default function DialogCustom(props: PropsType) {
             {titleCancel}
           </Button>
           <Button
-            sx={{ backgroundColor: "#49A569" }}
+            sx={{
+              backgroundColor: confirmButtonColor
+                ? confirmButtonColor
+                : "#49A569",
+            }}
             variant="contained"
-            onClick={handleConfirm}
+            onClick={handleConfirmWithData}
             autoFocus
           >
             {titleConfirm}

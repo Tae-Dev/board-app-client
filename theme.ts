@@ -6,6 +6,15 @@ const theme = createTheme({
   typography: {
     fontFamily: 'var(--font-roboto)',
   },
+  components: {
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          marginLeft: 0,
+        },
+      },
+    },
+  },
 });
 
 export default theme;
