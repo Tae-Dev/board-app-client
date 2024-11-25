@@ -66,7 +66,7 @@ type PropsType = {
   lists: ListType[];
   setValue?: UseFormSetValue<any>;
   name?: string;
-  value?: number | null | undefined;
+  value?: number | null | undefined | "";
   handleSelectPostTypeValue?: (id: number | "") => any
 };
 

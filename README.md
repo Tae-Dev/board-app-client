@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Board app client
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ขั้นตอนการติดตั้ง
+```
+1. Clone repository
+2. npm install
+3. สร้างไฟล์ .env (env ตัวอย่างจะอยู่ในไฟล์ .env.example)
+4. npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## การออกแบบสถาปัตยกรรมของแอปพลิเคชัน
+ **ภาพรวม**
+```
+ประกอบด้วย 3 ส่วน:
+Frontend: Next.js ใช้สำหรับแสดง UI
+Backend: ใช้ Nestjs สำหรับสร้าง service และเชื่อมค่อฐานข้อมูล
+Database: ใช้ฐานข้อมูล PostgreSQL
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**ฟังก์ชั่นการทำงาน**
+```
+1. Sign In
+ผู้ใช้งานเข้าสู่ระบบด้วย username
+ไม่มีการเก็บ username ของ user ใน database 
+เนื่องจากไม่มีระบบ authentication แต่จะเก็บ username ไว้ใน cookie แทน
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Dashboard Home
+แสดงรายการ blog ทั้งหมด
+ค้นหา Blog ด้วย Blog name และ Blog type
+คลิกที่ Blog เพื่อดูรายละเอียดและ Comment
+สร้าง Blog ใหม่
 
-## Learn More
+3. Dashboard Our Blog
+แสดงเฉพาะบล็อกที่ผู้ใช้งานสร้าง
+แก้ไข Blog
+ลบ Blog
 
-To learn more about Next.js, take a look at the following resources:
+4. Blog Detail Page
+แสดงรายละเอียด Blog
+ผู้ใช้งานสามารถเพิ่มความคิดเห็น
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Sign Out
+ผู้ใช้งานออกจากระบบ
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## libraries/packages
+```
+ 1. Material UI: ใช้ในการสร้าง ui และใช้งาน component
+ 2. Material Icon: ใช้งาน icon
+ 3. react-hook-form: สำหรับการจัดการฟิลด์ฟอร์ม
+ 4. axios: สำหรับทำงานกับ API
+ 5. yup: สำหรับการตรวจสอบข้อมูลในฟอร์ม
+ 6. tailwindcss: CSS Framework ใช้ออกแบบและจัดการ layout
+ 7.moment: สำหรับจัดการวันที่และเวลา
+```

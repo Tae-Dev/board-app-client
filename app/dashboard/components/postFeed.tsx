@@ -98,9 +98,9 @@ export default function PostFeed(props: PropsType) {
   }, []);
 
   return (
-    <Box className="flex flex-col w-full px-8 py-6 ">
-      <Grid size={{ xs: 12, md: 8 }} container sx={{ width: "100%" }}>
-        <Grid className="flex flex-col gap-6 w-full">
+    <Box className="flex flex-col w-full px-8 py-6">
+      <Grid size={{ xs: 12, md: 8 }} container sx={{ width: "100%",  height: "100%" }}>
+        <Grid className="flex flex-col gap-6 w-full" sx={{height: "100%"}}>
           <FormSearch
             fetchData={fetchData}
             handleOpenModalCreate={handleOpenModalCreate}

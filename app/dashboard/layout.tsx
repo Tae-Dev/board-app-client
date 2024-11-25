@@ -22,12 +22,22 @@ import { styled } from "@mui/material/styles";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MenuListConstant } from "./constants/menuListConstant";
+import { useBackDrop } from "@/providers/backdrop.provider";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   alignItems: "flex-start",
   paddingTop: theme.spacing(1),
+  paddingBottom: theme.spacing(1),
   backgroundColor: "#243831",
 }));
+
+type TemporaryDrawerPropsType = {
+  selectedIndex: number;
+  handleListItemClick: (event: any, index: number) => void;
+  toggleDrawer: (newOpen: boolean) => () => void;
+  open: boolean;
+  handleSignOut: () => void;
+};
 
 export default function DashBoardLayout({
   children,
@@ -35,29 +45,32 @@ export default function DashBoardLayout({
   readonly children: React.ReactNode;
 }) {
   const router = useRouter();
-  const pathname = usePathname()
+  const { openLoading } = useBackDrop()
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(1);
 
+
   useEffect(() => {
-    const pathSplit = pathname.split('/')
-    const index = MenuListConstant.findIndex((f) => f.path === pathSplit[2])
-    setSelectedIndex(index)
-  }, [pathname])
-  
+    const pathSplit = pathname.split("/");
+    const index = MenuListConstant.findIndex((f) => f.path === pathSplit[2]);
+    setSelectedIndex(index);
+  }, [pathname]);
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
 
   const handleSignOut = () => {
+    openLoading(true)
     document.cookie = "userName=; Path=/; Max-Age=0; Secure; SameSite=Strict";
     router.push("/signin");
+    openLoading(false)
   };
 
   const handleListItemClick = (event: any, index: number) => {
     setSelectedIndex(index);
-    router.push(`/dashboard/${MenuListConstant[index].path}`)
+    router.push(`/dashboard/${MenuListConstant[index].path}`);
   };
 
   return (
@@ -118,7 +131,10 @@ export default function DashBoardLayout({
                     <ListItemIcon sx={{ color: "#243831" }}>
                       {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                     </ListItemIcon>
-                    <ListItemText primary={item.name} className="text-[#243831]" />
+                    <ListItemText
+                      primary={item.name}
+                      className="text-[#243831]"
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -127,13 +143,19 @@ export default function DashBoardLayout({
           <Grid size={{ xs: 12, md: 9, lg: 9 }}>{children}</Grid>
         </Grid>
       </Box>
-      <TemporaryDrawer toggleDrawer={toggleDrawer} open={open} />
+      <TemporaryDrawer
+        toggleDrawer={toggleDrawer}
+        open={open}
+        selectedIndex={selectedIndex}
+        handleListItemClick={handleListItemClick}
+        handleSignOut={handleSignOut}
+      />
     </Box>
   );
 }
 
-const TemporaryDrawer = (props: any) => {
-  const { toggleDrawer, open } = props;
+const TemporaryDrawer = (props: TemporaryDrawerPropsType) => {
+  const { toggleDrawer, open, selectedIndex, handleListItemClick, handleSignOut } = props;
   const DrawerList = (
     <Box
       sx={{ width: 280, backgroundColor: "#243831", height: "100%" }}
@@ -150,19 +172,23 @@ const TemporaryDrawer = (props: any) => {
         <ArrowForwardIcon />
       </IconButton>
       <List>
-        {["Home", "Our Board"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
+        {MenuListConstant.map((item, index) => (
+          <ListItem key={index} disablePadding>
+            <ListItemButton
+              selected={selectedIndex === index}
+              onClick={(event) => handleListItemClick(event, index)}
+            >
               <ListItemIcon sx={{ color: "white" }}>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
-              <ListItemText primary={text} className="text-white" />
+              <ListItemText primary={item.name} className="text-white" />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
       <Box className="p-4">
         <Button
+        onClick={handleSignOut}
           variant="contained"
           sx={{
             backgroundColor: "#49A569",
@@ -170,7 +196,6 @@ const TemporaryDrawer = (props: any) => {
             borderRadius: "8px",
             fontSize: "16px",
             height: "44px",
-            display: { xs: "none", sm: "inherit" },
             width: "100%",
           }}
         >

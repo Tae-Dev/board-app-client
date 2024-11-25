@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     appDocumentPreloading: true
-  }
+  },
 };
 
 export default nextConfig;

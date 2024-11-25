@@ -1,7 +1,13 @@
 "use client";
 import AvatarCustom from "@/components/avatar";
+import DialogCustom from "@/components/dialog";
+import { useBackDrop } from "@/providers/backdrop.provider";
 import { Post, usePosts } from "@/providers/posts.provider";
+import AxiosInstance from "@/utils/axiosInstane";
+import GetCookieValue from "@/utils/getCookieValue";
+import BorderColorIcon from "@mui/icons-material/BorderColor";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Box,
   Chip,
@@ -12,17 +18,10 @@ import {
   ListItemAvatar,
   ListItemText,
 } from "@mui/material";
-import Avatar from "@mui/material/Avatar";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { PostFeedTypeConstant } from "../constants/postFeedTypeConstant";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DialogCustom from "@/components/dialog";
 import FormCreate, { CreatePostType } from "./formCreate";
-import GetCookieValue from "@/utils/getCookieValue";
-import { useBackDrop } from "@/providers/backdrop.provider";
-import AxiosInstance from "@/utils/axiosInstane";
 
 type PropsType = {
   postFeedType: PostFeedTypeConstant;
@@ -60,8 +59,6 @@ export default function PostList(props: PropsType) {
 
   const handleConfirmEdit = async (data: any) => {
     const userName = GetCookieValue("userName");
-    console.log("confirm", data);
-
     openLoading(true);
     try {
       const response = await AxiosInstance.patch("/posts", {
