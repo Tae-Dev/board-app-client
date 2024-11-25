@@ -51,5 +51,5 @@ Database: ใช้ฐานข้อมูล PostgreSQL
  4. axios: สำหรับทำงานกับ API
  5. yup: สำหรับการตรวจสอบข้อมูลในฟอร์ม
  6. tailwindcss: CSS Framework ใช้ออกแบบและจัดการ layout
- 7.moment: สำหรับจัดการวันที่และเวลา
+ 7. moment: สำหรับจัดการวันที่และเวลา
 ```
