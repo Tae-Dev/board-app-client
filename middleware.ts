@@ -5,6 +5,11 @@ export function middleware(req: NextRequest) {
   const userName = req.cookies.get("userName")?.value;
   const redirectedFlag = req.cookies.get("redirected");
 
+  if (userName && req.nextUrl.pathname === "/signin") {
+    const dashboardUrl = new URL("/dashboard/home", req.url);
+    return NextResponse.redirect(dashboardUrl, { status: 307 });
+  }
+
   if (!userName && req.nextUrl.pathname !== "/signin" && !redirectedFlag) {
     const signinUrl = new URL("/signin", req.url);
     const response = NextResponse.redirect(signinUrl);
@@ -26,5 +31,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|favicon.ico|.*\\.ico).*)"],
 };

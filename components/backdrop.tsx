@@ -8,7 +8,7 @@ export default function BackdropCustom(props: PropsType) {
   const { open } = props;
   return (
     <Backdrop
-      sx={(theme) => ({ color: "#fff", zIndex: 1400 })}
+      sx={() => ({ color: "#fff", zIndex: 1400 })}
       open={open}
     >
       <CircularProgress color="inherit" />

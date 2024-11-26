@@ -4,16 +4,13 @@ import { useBackDrop } from "@/providers/backdrop.provider";
 import { usePosts } from "@/providers/posts.provider";
 import AxiosInstance from "@/utils/axiosInstane";
 import GetCookieValue from "@/utils/getCookieValue";
-import AddIcon from "@mui/icons-material/Add";
-import SearchIcon from "@mui/icons-material/Search";
-import { Box, Button, InputAdornment, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useEffect, useState } from "react";
 import { PostFeedTypeConstant } from "../constants/postFeedTypeConstant";
 import FormCreate from "./formCreate";
-import PostList from "./postList";
-import MenuCustom from "@/components/menu";
 import FormSearch from "./formSearch";
+import PostList from "./postList";
 
 type PropsType = {
   postFeedType: PostFeedTypeConstant;
@@ -22,7 +19,7 @@ type PropsType = {
 export default function PostFeed(props: PropsType) {
   const { postFeedType } = props;
   const [openModalCreate, setOpenModalCreate] = useState(false);
-  const { postsList, addPosts, addPostType, postsTypeList } = usePosts();
+  const { postsList, addPosts, addPostType } = usePosts();
   const { openLoading, openBackDrop } = useBackDrop();
 
   const handleOpenModalCreate = () => {

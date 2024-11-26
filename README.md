@@ -13,7 +13,7 @@
 ```
 ประกอบด้วย 3 ส่วน:
 Frontend: Next.js ใช้สำหรับแสดง UI
-Backend: ใช้ Nestjs สำหรับสร้าง service และเชื่อมค่อฐานข้อมูล
+Backend: ใช้ Nestjs สำหรับสร้าง service และเชื่อมต่อฐานข้อมูล
 Database: ใช้ฐานข้อมูล PostgreSQL
 ```
 
