@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   experimental: {
     appDocumentPreloading: true
   },
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    unoptimized: false,
+  },
 };
 
 export default nextConfig;

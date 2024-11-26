@@ -53,7 +53,7 @@ export default function AuthLayout({
               src="/static/images/notebook.png"
               width={300}
               height={300}
-              alt=""
+              alt="Notebook"
             />
             <Box className="text-white font-normal text-[28px] italic">a Board</Box>
           </Box>
